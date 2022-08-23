@@ -3,18 +3,28 @@ export function parseParagraphToMarkdown(blocks) {
 }
 
 function markdownToText(item) {
-  switch (item.type) {
-    case 'text':
-      return item.value;
-    case 'strong':
-      return `<b>${markdownToText(item.children[0])}</b>`;
-    case 'emphasis':
-      return `<em>${markdownToText(item.children[0])}</em>`;
-    case 'underline':
-      return `<u class="cdx-underline">${markdownToText(item.children[0])}</u>`;
-    default:
-      return '';
+  if (item.type === 'text') return item.value;
+
+  let text = '';
+  if (item.children && item.children.length > 0) {
+    item.children.forEach((child) => {
+      switch (item.type) {
+        case 'strong':
+          text += `<b>${markdownToText(child)}</b>`;
+          break;
+        case 'emphasis':
+          text += `<em>${markdownToText(child)}</em>`;
+          break;
+        case 'underline':
+          text += `<u class="cdx-underline">${markdownToText(child)}</u>`;
+          break;
+        default:
+          break;
+      }
+    });
   }
+
+  return text;
 }
 
 export function parseMarkdownToParagraph(blocks) {
