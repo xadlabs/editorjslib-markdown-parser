@@ -1,5 +1,16 @@
+import { unified } from 'unified';
+import rehypeParse from 'rehype-parse';
+import rehypeRemark from 'rehype-remark';
+import remarkStringify from 'remark-stringify';
+
 export function parseParagraphToMarkdown(blocks) {
-  return `${blocks.text}\n`;
+  const output = unified()
+    .use(rehypeParse) // Parse HTML to a syntax tree
+    .use(rehypeRemark) // Turn HTML syntax tree to markdown syntax tree
+    .use(remarkStringify) // Serialize HTML syntax tree
+    .processSync(blocks.text);
+
+  return `${String(output)}\n`;
 }
 
 function markdownToText(item) {
@@ -21,7 +32,7 @@ function markdownToText(item) {
         text += `<b>${processChildren(item.children)}</b>`;
         break;
       case 'emphasis':
-        text += `<em>${processChildren(item.children)}</em>`;
+        text += `<i>${processChildren(item.children)}</i>`;
         break;
       case 'underline':
         text += `<u class="cdx-underline">${processChildren(item.children)}</u>`;

@@ -1,4 +1,4 @@
-import * as remark from 'remark';
+import { remark } from 'remark';
 
 import { parseHeaderToMarkdown, parseMarkdownToHeader } from './BlockTypeParsers/HeaderTypeParser';
 import {
@@ -18,7 +18,7 @@ import { parseCheckboxToMarkdown } from './BlockTypeParsers/CheckboxTypeParser';
 export default class Utils {
   markdownToJson(data) {
     const editorData = [];
-    const parsedMarkdown = remark().parse(data);
+    const parsedMarkdown = remark.parse(data);
 
     console.log('parsedMarkdown');
     console.log(JSON.stringify(parsedMarkdown));
