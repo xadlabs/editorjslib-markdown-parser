@@ -5,23 +5,30 @@ export function parseParagraphToMarkdown(blocks) {
 function markdownToText(item) {
   if (item.type === 'text') return item.value;
 
+  function processChildren(children) {
+    let text = '';
+    children.forEach((child) => {
+      text += markdownToText(child);
+    });
+
+    return text;
+  }
+
   let text = '';
   if (item.children && item.children.length > 0) {
-    item.children.forEach((child) => {
-      switch (item.type) {
-        case 'strong':
-          text += `<b>${markdownToText(child)}</b>`;
-          break;
-        case 'emphasis':
-          text += `<em>${markdownToText(child)}</em>`;
-          break;
-        case 'underline':
-          text += `<u class="cdx-underline">${markdownToText(child)}</u>`;
-          break;
-        default:
-          break;
-      }
-    });
+    switch (item.type) {
+      case 'strong':
+        text += `<b>${processChildren(item.children)}</b>`;
+        break;
+      case 'emphasis':
+        text += `<em>${processChildren(item.children)}</em>`;
+        break;
+      case 'underline':
+        text += `<u class="cdx-underline">${processChildren(item.children)}</u>`;
+        break;
+      default:
+        break;
+    }
   }
 
   return text;
