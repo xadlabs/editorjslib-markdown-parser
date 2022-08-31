@@ -20,9 +20,6 @@ export default class Utils {
     const editorData = [];
     const parsedMarkdown = remark.parse(data);
 
-    console.log('parsedMarkdown');
-    console.log(JSON.stringify(parsedMarkdown));
-
     // Iterating over the pared remarkjs syntax tree and executing the json parsers
     parsedMarkdown.children.forEach((item) => {
       switch (item.type) {
@@ -42,9 +39,6 @@ export default class Utils {
           break;
       }
     });
-
-    console.log('editorData');
-    console.log(JSON.stringify(editorData));
 
     // Filter through array and remove empty objects
     return {
