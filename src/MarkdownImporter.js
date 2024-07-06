@@ -1,4 +1,4 @@
-import * as remark from 'remark';
+import { remark } from 'remark';
 import { parseMarkdownToHeader } from './BlockTypeParsers/HeaderTypeParser';
 import { parseMarkdownToParagraph } from './BlockTypeParsers/ParagraphTypeParser';
 import { parseMarkdownToList } from './BlockTypeParsers/ListTypeParser';
@@ -45,6 +45,32 @@ export default class MarkdownImporter {
     return doc;
   }
 
+  tryToParseChecklist(text) {
+    if (text.includes('- [ ]') || text.includes('- [x]')) {
+      const items = [];
+      for (const line of text.split('\n')) {
+        const groups = line.match(/^(\t*)\s*- \[([ |x])\]\s*(.*)/)
+        let tabs = 0;
+        let checked = false;
+        let text = line;
+        if (groups.length == 4) {
+          tabs = groups[1].length;
+          checked = groups[2] == 'x';
+          text = groups[3];
+        }
+        items.push({
+          checked: checked,
+          text: text,
+          level: tabs,
+        });
+      }
+      return {
+        type: 'checklist',
+        data: { items }
+      }
+    }
+  }
+
   /**
   * Function which parses markdown file to JSON which correspons the the editor structure
   * @return Parsed markdown in JSON format
@@ -71,13 +97,21 @@ export default class MarkdownImporter {
         const parsedMarkdown = remark().parse(content);
         // iterating over the pared remarkjs syntax tree and executing the json parsers
         parsedMarkdown.children.forEach((item, index) => {
+          console.log(item.type);
           switch (item.type) {
             case 'heading':
               return editorData.push(parseMarkdownToHeader(item));
             case 'paragraph':
-              return editorData.push(parseMarkdownToParagraph(item));
+              return editorData.push(...parseMarkdownToParagraph(item));
             case 'list':
-              return editorData.push(parseMarkdownToList(item));
+              {
+                const text = content.substring(item.position.start.offset, item.position.end.offset);
+                const checklist = this.tryToParseChecklist(text);
+                if (checklist) {
+                  return editorData.push(checklist);
+                }
+                return editorData.push(parseMarkdownToList(item));
+              }
             case 'thematicBreak':
               return editorData.push(parseMarkdownToDelimiter());
             case 'code':

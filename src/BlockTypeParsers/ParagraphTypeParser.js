@@ -50,12 +50,13 @@ export function parseMarkdownToParagraph(paragraphBlock) {
   let currentParagraph = null;
 
   paragraphBlock.children.forEach((item) => {
+    console.log(item);
     switch (item.type) {
       case 'text':
       case 'strong':
       case 'emphasis':
       case 'underline':
-        if (currentParagraph && currentParagraph.type === 'image') {
+        if (currentParagraph) {
           paragraphs.push(currentParagraph);
           currentParagraph = null;
         }
@@ -72,23 +73,18 @@ export function parseMarkdownToParagraph(paragraphBlock) {
         currentParagraph.data.text += markdownToText(item);
         break;
       case 'image':
-        if (currentParagraph.type === 'paragraph') {
+        if (currentParagraph) {
           paragraphs.push(currentParagraph);
           currentParagraph = null;
         }
 
-        if (!currentParagraph) {
-          currentParagraph = {
-            type: 'image',
-            data: {
-              caption: item.title,
-              stretched: false,
-              url: item.url,
-              withBackground: false,
-              withBorder: false,
-            },
-          };
-        }
+        currentParagraph = {
+          type: 'image',
+          data: {
+            caption: item.title || item.alt,
+            file: { url: item.url },
+          },
+        };
         break;
       default:
         break;
