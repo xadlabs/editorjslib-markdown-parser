@@ -1,5 +1,5 @@
 {
-  "name": "editorjslib-markdown",
+  "name": "zmeditorjslib-markdown",
   "main": "./dist/bundle.umd.js",
   "module": "./dist/bundle.mjs",
   "scripts": {
@@ -13,7 +13,7 @@
     "vite": "^5.3.3"
   },
   "description": "Import from markdown and export editorjs data to markdown",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "dependencies": {
     "rehype-parse": "^8.0.4",
     "rehype-remark": "^9.1.2",
