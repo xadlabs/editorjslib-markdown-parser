@@ -45,6 +45,15 @@ export default class MarkdownImporter {
     return doc;
   }
 
+  importDirectly() {
+    const doc = document.createElement('input');
+    doc.setAttribute('id', 'file-upload');
+    doc.setAttribute('type', 'file');
+    doc.setAttribute('style', 'display: none');
+    doc.setAttribute('name', 'files[]');
+    this.parseMarkdown(doc);
+  }
+
   tryToParseChecklist(text) {
     if (text.includes('- [ ]') || text.includes('- [x]')) {
       const items = [];
@@ -75,7 +84,7 @@ export default class MarkdownImporter {
   * Function which parses markdown file to JSON which correspons the the editor structure
   * @return Parsed markdown in JSON format
   */
-  async parseMarkdown() {
+  async parseMarkdown(el) {
     // empty the array before running the function again
     editorData.length = 0;
 
@@ -83,7 +92,7 @@ export default class MarkdownImporter {
     const data = await this.api.saver.save();
     a.content = data.blocks;
 
-    const fileUpload = document.getElementById('file-upload');
+    const fileUpload = el || document.getElementById('file-upload');
 
     fileUpload.onchange = (e) => {
       const file = e.target.files[0];
@@ -97,7 +106,6 @@ export default class MarkdownImporter {
         const parsedMarkdown = remark().parse(content);
         // iterating over the pared remarkjs syntax tree and executing the json parsers
         parsedMarkdown.children.forEach((item, index) => {
-          console.log(item.type);
           switch (item.type) {
             case 'heading':
               return editorData.push(parseMarkdownToHeader(item));
